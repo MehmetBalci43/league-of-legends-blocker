@@ -36,29 +36,62 @@ $hostsContent = Get-Content -Path $hostsPath
 $startMarker = "# === LoL Block Start ==="
 $endMarker = "# === LoL Block End ==="
 
-# Remove LoL blocks
+# Remove LoL blocks - improved version
 $newContent = @()
 $skipLines = $false
 $removedCount = 0
 
+# List of LoL-related domains to remove
+$lolDomains = @(
+    "riot", "riotgames", "leagueoflegends", "lol\.", "valorant", 
+    "riotcdn", "akamaihd\.net", "playvalorant"
+)
+
 foreach ($line in $hostsContent) {
+    # Check if this is a marker line
     if ($line -eq $startMarker) {
         $skipLines = $true
+        Write-Host "  [Found] LoL Block Start marker" -ForegroundColor DarkGray
         continue
     }
     elseif ($line -eq $endMarker) {
         $skipLines = $false
+        Write-Host "  [Found] LoL Block End marker" -ForegroundColor DarkGray
         continue
     }
     
+    # Skip lines between markers
     if ($skipLines) {
         if ($line -match "^127\.0\.0\.1\s+") {
             $removedCount++
+            Write-Host "  [-] Removed: $line" -ForegroundColor DarkGray
+        }
+        continue
+    }
+    
+    # Check for LoL-related comments (Turkish or English)
+    if ($line -match "League of Legends|LoL Block|Riot Games") {
+        Write-Host "  [-] Removed comment: $line" -ForegroundColor DarkGray
+        continue
+    }
+    
+    # Check for LoL-related domain entries (even outside markers)
+    $isLolEntry = $false
+    foreach ($domain in $lolDomains) {
+        if ($line -match $domain) {
+            $isLolEntry = $true
+            break
         }
     }
-    else {
-        $newContent += $line
+    
+    if ($isLolEntry -and ($line -match "^127\.0\.0\.1\s+" -or $line -match "^0\.0\.0\.0\s+")) {
+        $removedCount++
+        Write-Host "  [-] Removed orphan entry: $line" -ForegroundColor DarkGray
+        continue
     }
+    
+    # Keep all other lines
+    $newContent += $line
 }
 
 # Update hosts file

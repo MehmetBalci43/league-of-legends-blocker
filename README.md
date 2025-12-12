@@ -19,10 +19,13 @@ A simple tool to block League of Legends servers by modifying your Windows hosts
 ## 📋 Contents
 
 - **`block_lol.bat`** - Block LoL servers (EASY METHOD) ⭐
-- **`unblock_lol.bat`** - Remove the block
+- **`unblock_lol.bat`** - Remove the block (UPDATED v1.1) ⭐
+- **`check_status.ps1`** - Check if LoL is currently blocked (NEW!) 🔍
 - `block_lol.ps1` - PowerShell version (alternative)
-- `unblock_lol.ps1` - PowerShell unblock (alternative)
+- `unblock_lol.ps1` - PowerShell unblock (alternative, UPDATED v1.1)
 - `README.md` - This file
+- `CHANGELOG.md` - Version history
+- `BUG_REPORT.md` - Detailed bug fix documentation
 
 ## 🚀 Quick Start (Recommended)
 
@@ -41,6 +44,14 @@ If you really want to play again (but don't! 💪):
 1. **Right-click** on `unblock_lol.bat`
 2. Select **"Run as administrator"**
 3. Block removed (but you'll regret it!)
+
+### To Check Block Status:
+
+Want to verify if LoL is blocked? (No admin rights needed!)
+
+1. **Double-click** on `check_status.ps1`
+2. Or run: `powershell -ExecutionPolicy Bypass -File .\check_status.ps1`
+3. See current block status instantly! 🔍
 
 ---
 
@@ -118,7 +129,7 @@ Change PowerShell execution policy:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-### Still able to connect:
+### Still able to connect after blocking:
 
 1. Restart your computer
 2. Manually flush DNS cache:
@@ -126,6 +137,38 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
    ipconfig /flushdns
    ```
 3. Disable VPN if you're using one
+
+### Unblock not working (Can't connect even after unblock):
+
+**UPDATED FIX (v1.1):** The unblock script has been improved to handle legacy blocks!
+
+If you still can't connect after running `unblock_lol.bat`:
+
+1. **Verify the unblock worked:**
+   ```powershell
+   notepad C:\Windows\System32\drivers\etc\hosts
+   ```
+   - Look for any lines containing `riot`, `lol`, `valorant`, or `riotgames`
+   - All LoL-related entries should be removed
+
+2. **Flush DNS cache:**
+   ```powershell
+   ipconfig /flushdns
+   ```
+
+3. **Restart Riot Client completely:**
+   - Close Riot Client from system tray
+   - Open Task Manager (Ctrl+Shift+Esc)
+   - End all Riot-related processes
+   - Restart the client
+
+4. **Restart your computer** (most reliable solution)
+
+**Note:** The improved unblock script now removes:
+- ✅ Blocks with markers (`# === LoL Block Start ===`)
+- ✅ Legacy blocks without markers
+- ✅ Turkish comments (`# League of Legends Engellendi`)
+- ✅ Orphan entries from previous versions
 
 ### Manual hosts file check:
 
